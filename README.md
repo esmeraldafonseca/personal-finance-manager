@@ -67,6 +67,18 @@ projecto3-app/
 └── pyproject.toml
 ```
 
+## Problemas Conhecidos
+ 
+**A aplicação pode congelar ou mostrar ecrã preto em sistemas com dois ou mais monitores ligados.**
+ 
+Este é um bug conhecido do motor gráfico Flutter (usado pelo Flet por baixo), não relacionado com o código deste projeto. Acontece de forma aleatória, tipicamente ao mover a janela entre monitores ou ao arrancar a app num monitor que não é o principal.
+ 
+Formas de contornar:
+- Usar apenas um monitor ligado ao correr a aplicação.
+- Evitar mover a janela da app entre ecrãs depois de aberta.
+Referência: [flet-dev/flet#6629](https://github.com/flet-dev/flet/issues/6629)
+
+
 ## Correr a aplicação
 
 Instalar as dependências:
@@ -96,13 +108,13 @@ Para mais detalhes, consulta o [Getting Started Guide](https://flet.dev/docs/) d
 - Testes automatizados.
 
 
-## 👩‍💻 Autora
+## Autora
 
 **Esmeralda Fonseca**
 
 Projeto académico desenvolvido no âmbito da formação orientada pelo formador **Sebilson Cristóvão**.
 
 
-## 📄 Contribuições
+## Contribuições
 
 Contribuições são bem-vindas. Por favor faça um fork do repositorio e envie um pull request com as suas melhorias
