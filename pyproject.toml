@@ -8,7 +8,8 @@ authors = [
     { name = "Esmeralda Fonseca", email = "Esmeralda.Fonseca2003@gmail.com" }
 ]
 dependencies = [
-    "flet>=0.86.5"
+    "flet>=0.86.5",
+    "matplotlib>=3.10.9",
 ]
 
 [dependency-groups]
