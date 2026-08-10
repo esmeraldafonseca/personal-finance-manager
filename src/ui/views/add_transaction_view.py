@@ -46,11 +46,39 @@ def build(app, transaction: Transaction = None) -> ft.Column:
         border_radius=10, filled=True, bgcolor=WHITE, expand=True,
         keyboard_type=ft.KeyboardType.NUMBER,
     )
-    date_field = ft.TextField(
-        label="Data *", hint_text="DD/MM/AAAA",
-        value=transaction.data if editing else dt.date.today().strftime("%d/%m/%Y"),
-        border_radius=10, filled=True, bgcolor=WHITE, expand=True,
+
+    data_inicial = (
+        dt.datetime.strptime(transaction.data, "%d/%m/%Y") 
+        if editing else dt.datetime.today()
     )
+    estado_data = {"valor": data_inicial}
+
+    date_field = ft.TextField(
+        label="Data *",
+        value=data_inicial.strftime("%d/%m/%Y"),
+        read_only=True,
+        border_radius=10, filled=True, bgcolor=WHITE, expand=True,
+        suffix_icon=ft.Icons.CALENDAR_MONTH,
+        on_click=lambda e: app.page.show_dialog(date_picker),
+    )
+
+    def on_date_change(e):
+        estado_data["valor"] = e.control.value
+        date_field.value = e.control.value.strftime("%d/%m/%Y")
+        app.page.update()
+
+    date_picker = ft.DatePicker(
+        first_date=dt.datetime(2000, 1, 1),
+        last_date=dt.datetime.today(),  # impede escolher datas futuras 
+        value=data_inicial,
+        on_change=on_date_change,
+    )
+    
+    if getattr(app, "_date_picker", None) in app.page.overlay:
+        app.page.overlay.remove(app._date_picker)
+    app.page.overlay.append(date_picker)
+    app._date_picker = date_picker
+
     note_field = ft.TextField(
         label="Observação", value=transaction.observacao if editing else "",
         multiline=True, min_lines=3, max_lines=4, border_radius=10, filled=True, bgcolor=WHITE,
@@ -65,7 +93,7 @@ def build(app, transaction: Transaction = None) -> ft.Column:
                 tipo=type_dropdown.value,
                 categoria=category_dropdown.value or "",
                 valor=float(value_text) if value_text else 0,
-                data=(date_field.value or "").strip(),
+                data=estado_data["valor"].strftime("%d/%m/%Y"),
                 observacao=(note_field.value or "").strip(),
             )
             if app.selected_transaction_id:
