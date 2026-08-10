@@ -1,26 +1,22 @@
+"""
+Projeto: Sistema de gestão de finanças pessoais
+Autora: Esmeralda Fonseca
+Monitor: Sebilson Cristovão
+Descrição: Aplicação para gerenciamento de finanças pessoais desenvolvida em python.
+"""
+
 import flet as ft
 
+from database.database import Database
+from repositories.transaction_repository import TransactionRepository
+from services.reports import FinancialReport
+from ui.app_layout import AppLayout
 
 def main(page: ft.Page):
-    counter = ft.Text("0", size=50, data=0)
+    database = Database()
+    repository = TransactionRepository(database)
+    report_service = FinancialReport(repository)
+    AppLayout(page, repository, report_service)
 
-    def increment_click(e: ft.Event[ft.FloatingActionButton]):
-        counter.data += 1
-        counter.value = str(counter.data)
+ft.app(target=main)
 
-    page.floating_action_button = ft.FloatingActionButton(
-        icon=ft.Icons.ADD, key="increment", on_click=increment_click
-    )
-    page.add(
-        ft.SafeArea(
-            expand=True,
-            content=ft.Container(
-                content=counter,
-                alignment=ft.Alignment.CENTER,
-            ),
-        )
-    )
-
-
-if __name__ == "__main__":
-    ft.run(main)
