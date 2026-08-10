@@ -2,7 +2,6 @@
 Projeto: Sistema de gestão de finanças pessoais
 Autora: Esmeralda Fonseca
 Monitor: Sebilson Cristovão
-Descrição: Aplicação para gerenciamento de finanças pessoais desenvolvida em python.
 """
 
 import flet as ft
