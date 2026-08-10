@@ -17,5 +17,6 @@ def main(page: ft.Page):
     report_service = FinancialReport(repository)
     AppLayout(page, repository, report_service)
 
-ft.app(target=main)
+if __name__ == "__main__":
+    ft.run(main)
 
