@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 
 
 # Tipos de movimentação aceites pelo sistema.
@@ -31,8 +32,8 @@ class Transaction:
         Valida os dados do transaction antes de serem persistidos na
         base de dados
           """
-        if not self.descricao or not self.descricao.strip():
-            raise ValueError("A descrição é obrigatória.")
+        
+        self._validar_descricao()
 
         if self.tipo not in VALID_TRANSACTION_TYPES:
             raise ValueError("O tipo deve ser 'Receita' ou 'Despesa'.")
@@ -41,31 +42,47 @@ class Transaction:
             raise ValueError("A categoria é obrigatória.")
 
         try:
-            amount_float = float(self.valor)
+            valor_float = float(self.valor)
         except (TypeError, ValueError):
             raise ValueError("O valor deve ser numérico.")
 
-        if amount_float <= 0:
+        if valor_float <= 0:
             raise ValueError("O valor deve ser maior que zero.")
 
+        self._validar_data()
+
+    def _validar_descricao(self) -> None:
+        """Descrição obrigatória, com pelo menos 3 caracteres e não
+        composta apenas por dígitos."""
+        if not self.descricao or not self.descricao.strip():
+            raise ValueError("A descrição é obrigatória.")
+
+        descricao_limpa = self.descricao.strip()
+
+        if len(descricao_limpa) < 3:
+            raise ValueError("A descrição deve ter no mínimo 3 caracteres.")
+
+        if descricao_limpa.isdigit():
+            raise ValueError("A descrição não pode conter apenas números.")
+
+    def _validar_data(self) -> None:
+        """
+        Confirma que a data está num formato válido (DD/MM/AAAA) e não
+        é futura.
+        """
         if not self.data or not self.data.strip():
             raise ValueError("A data é obrigatória.")
 
-        # Validação simples do formato DD/MM/AAAA.
-        parts = self.data.split("/")
-        if len(parts) != 3:
+        try:
+            data_convertida = datetime.strptime(self.data.strip(), "%d/%m/%Y").date()
+        except ValueError:
             raise ValueError("A data deve estar no formato DD/MM/AAAA.")
 
-        day, month, year = parts
-        if not (day.isdigit() and month.isdigit() and year.isdigit()):
-            raise ValueError("A data deve estar no formato DD/MM/AAAA.")
-
-        day_int, month_int = int(day), int(month)
-        if not (1 <= day_int <= 31) or not (1 <= month_int <= 12):
-            raise ValueError("A data contém day ou mês inválido.")
+        if data_convertida > datetime.today().date():
+            raise ValueError("A data não pode ser uma data futura.")
 
     def to_tuple(self):
-        """Devolve os campos do transaction como tuplo, útil para o SQL."""
+        """Devolve os campos da transação como tuplo, útil para o SQL."""
         return (self.descricao, self.tipo, self.categoria, float(self.valor), self.data, self.observacao or "")
 
     @staticmethod
