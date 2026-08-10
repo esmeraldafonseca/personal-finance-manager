@@ -26,3 +26,8 @@ storage/
 
 # macOS
 .DS_Store
+
+#banco de dados
+*.db
+
+.python-version
