@@ -103,3 +103,62 @@ def expenses_by_category_chart(data: list) -> bytes:
 
     fig.tight_layout()
     return _figure_to_bytes(fig)
+
+
+def users_status_chart(ativos: int, inativos: int) -> bytes:
+    """Gera um gráfico de barras comparando utilizadores ativos com inativos."""
+    if ativos <= 0 and inativos <= 0:
+        raise NoChartDataError("Não existem utilizadores suficientes para gerar o gráfico.")
+
+    fig, ax = plt.subplots(figsize=(5.5, 4))
+    labels = ["Ativos", "Inativos"]
+    values = [ativos, inativos]
+    colors = [INCOME_COLOR, EXPENSE_COLOR]
+
+    bars = ax.bar(labels, values, color=colors, width=0.5)
+
+    ax.set_title("Utilizadores Ativos vs Inativos", fontsize=13, fontweight="bold", color=TEXT_COLOR)
+    ax.set_ylabel("Número de Utilizadores", color=TEXT_COLOR)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.tick_params(colors=TEXT_COLOR)
+
+    for bar, value in zip(bars, values):
+        ax.text(
+            bar.get_x() + bar.get_width() / 2, bar.get_height(), str(value),
+            ha="center", va="bottom", fontsize=9, color=TEXT_COLOR,
+        )
+
+    fig.tight_layout()
+    return _figure_to_bytes(fig)
+
+
+def expenses_by_user_chart(data: list) -> bytes:
+    """
+    Gráfico de barras horizontais com o total de despesas por utilizador.
+    'data' é uma lista de tuplos (nome_utilizador, total_despesas).
+    """
+    valid_data = [(nome, total) for nome, total in data if total and total > 0]
+    if not valid_data:
+        raise NoChartDataError("Não existem despesas suficientes para gerar o gráfico.")
+
+    nomes = [item[0] for item in valid_data]
+    valores = [item[1] for item in valid_data]
+    colors = (CATEGORY_COLORS * ((len(nomes) // len(CATEGORY_COLORS)) + 1))[: len(nomes)]
+
+    fig, ax = plt.subplots(figsize=(6, 4.5))
+    bars = ax.barh(nomes, valores, color=colors)
+
+    ax.set_title("Despesas por Utilizador", fontsize=13, fontweight="bold", color=TEXT_COLOR)
+    ax.set_xlabel("Valor (Kz)", color=TEXT_COLOR)
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.tick_params(colors=TEXT_COLOR)
+    ax.invert_yaxis()
+
+    for bar, valor in zip(bars, valores):
+        ax.text(
+            bar.get_width(), bar.get_y() + bar.get_height() / 2, f" {valor:,.2f} Kz",
+            va="center", fontsize=8, color=TEXT_COLOR,
+        )
+
+    fig.tight_layout()
+    return _figure_to_bytes(fig)
