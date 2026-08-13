@@ -17,7 +17,7 @@ EXPENSE_CATEGORIES = [
 
 @dataclass
 class Transaction:
-    """Representa uma movimentação financeira (receita ou despesa)."""
+    """Representa uma movimentação financeira (receita ou despesa) de um utilizador."""
 
     descricao: str
     tipo: str
@@ -26,6 +26,7 @@ class Transaction:
     data: str  # formato esperado: DD/MM/AAAA
     observacao: str = ""
     id: int = None
+    user_id: int = None
 
     def validar(self) -> None:
         """
@@ -83,7 +84,8 @@ class Transaction:
 
     def to_tuple(self):
         """Devolve os campos da transação como tuplo, útil para o SQL."""
-        return (self.descricao, self.tipo, self.categoria, float(self.valor), self.data, self.observacao or "")
+        return (self.descricao, self.tipo, self.categoria, float(self.valor), self.data,
+                self.observacao or "", self.user_id)
 
     @staticmethod
     def from_row(row) -> "Transaction":
@@ -96,4 +98,5 @@ class Transaction:
             valor=row[4],
             data=row[5],
             observacao=row[6],
+            user_id=row[7] if len(row) > 7 else None,
         )
