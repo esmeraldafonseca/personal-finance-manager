@@ -24,13 +24,13 @@ class FinancialReport:
     def __init__(self, repository: TransactionRepository):
         self.repository = repository
 
-    def generate_monthly_report(self, month: str, year: str) -> MonthlyReport:
+    def generate_monthly_report(self, month: str, year: str, user_id: int = None) -> MonthlyReport:
         """
         Gera o relatório mensal completo: totais, saldo, número de
         movimentações, categoria com maior despesa, maior receita e
         maior despesa do mês.
         """
-        transactions = self.repository.filter_by_month(month, year)
+        transactions = self.repository.filter_by_month(month, year, user_id=user_id)
 
         incomes = [t.valor for t in transactions if t.tipo == "Receita"]
         expenses = [t.valor for t in transactions if t.tipo == "Despesa"]
