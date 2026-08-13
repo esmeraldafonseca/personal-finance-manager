@@ -4,10 +4,11 @@ from ui.views.theme import MEDIUM_GREEN, YELLOW, WHITE, DARK_TEXT, GRAY_TEXT, TI
 
 
 def build(app) -> ft.Column:
-    """Constrói a vista de Categorias: totais acumulados por categoria (receitas e despesas)."""
+    """Constrói a vista de Categorias: totais acumulados por categoria (receitas e despesas),
+    restrita às movimentações do utilizador atual."""
 
-    expense_totals = app.repo.totals_by_category("Despesa")
-    income_totals = app.repo.totals_by_category("Receita")
+    expense_totals = app.repo.totals_by_category("Despesa", user_id=app.current_user.id)
+    income_totals = app.repo.totals_by_category("Receita", user_id=app.current_user.id)
 
     return ft.Column(
         [

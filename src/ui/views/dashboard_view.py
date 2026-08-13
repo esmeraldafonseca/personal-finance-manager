@@ -9,10 +9,10 @@ from ui.views.theme import (
 
 
 def build(app) -> ft.Column:
-    """Constrói a vista do Dashboard: totais gerais + últimas movimentações."""
+    """Constrói a vista do Dashboard: totais gerais + últimas movimentações do utilizador atual."""
 
     repo = app.repo
-    transactions = repo.list_transactions()
+    transactions = repo.list_transactions(user_id=app.current_user.id)
     total_income = sum(t.valor for t in transactions if t.tipo == INCOME_TYPE)
     total_expenses = sum(t.valor for t in transactions if t.tipo != INCOME_TYPE)
     balance = total_income - total_expenses

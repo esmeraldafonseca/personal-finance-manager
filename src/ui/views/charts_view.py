@@ -9,11 +9,11 @@ def build(app) -> ft.Column:
 
     existing_years = app.repo.get_existing_years()
     month_dropdown = ft.Dropdown(width=150, value=app.chart_month,
-                                  options=[ft.dropdown.Option("Todos")] + [ft.dropdown.Option(m, label) for m, label in MONTHS],
+                                  options=[ft.dropdown.Option("Meses")] + [ft.dropdown.Option(m, label) for m, label in MONTHS],
                                   border_radius=10, filled=True, bgcolor=WHITE,
                                   on_select=lambda e: _update_period(app, e.control.value, app.chart_year))
     year_dropdown = ft.Dropdown(width=110, value=app.chart_year,
-                                 options=[ft.dropdown.Option("Todos")] + [ft.dropdown.Option(a) for a in existing_years],
+                                 options=[ft.dropdown.Option("Anos")] + [ft.dropdown.Option(a) for a in existing_years],
                                  border_radius=10, filled=True, bgcolor=WHITE,
                                  on_select=lambda e: _update_period(app, app.chart_month, e.control.value))
 

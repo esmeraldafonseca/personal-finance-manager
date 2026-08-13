@@ -48,7 +48,7 @@ def build(app, transaction: Transaction = None) -> ft.Column:
     )
 
     data_inicial = (
-        dt.datetime.strptime(transaction.data, "%d/%m/%Y") 
+        dt.datetime.strptime(transaction.data, "%d/%m/%Y")
         if editing else dt.datetime.today()
     )
     estado_data = {"valor": data_inicial}
@@ -69,11 +69,11 @@ def build(app, transaction: Transaction = None) -> ft.Column:
 
     date_picker = ft.DatePicker(
         first_date=dt.datetime(2000, 1, 1),
-        last_date=dt.datetime.today(),  # impede escolher datas futuras 
+        last_date=dt.datetime.today(),  # impede escolher datas futuras
         value=data_inicial,
         on_change=on_date_change,
     )
-    
+
     if getattr(app, "_date_picker", None) in app.page.overlay:
         app.page.overlay.remove(app._date_picker)
     app.page.overlay.append(date_picker)
@@ -95,6 +95,7 @@ def build(app, transaction: Transaction = None) -> ft.Column:
                 valor=float(value_text) if value_text else 0,
                 data=estado_data["valor"].strftime("%d/%m/%Y"),
                 observacao=(note_field.value or "").strip(),
+                user_id=app.current_user.id,
             )
             if app.selected_transaction_id:
                 app.repo.update_transaction(new_transaction)
@@ -108,10 +109,29 @@ def build(app, transaction: Transaction = None) -> ft.Column:
         except RuntimeError as erro:
             app.show_message(f"Erro ao ligar à base de dados: {erro}", error=True)
 
+    def clear_fields(e):
+        """Repõe o formulário nos valores por omissão (não afeta o modo de edição em curso)."""
+        description_field.value = ""
+        type_dropdown.value = EXPENSE_TYPE
+        category_dropdown.options = [ft.dropdown.Option(c) for c in EXPENSE_CATEGORIES]
+        category_dropdown.value = None
+        value_field.value = ""
+        estado_data["valor"] = dt.datetime.today()
+        date_field.value = estado_data["valor"].strftime("%d/%m/%Y")
+        date_picker.value = estado_data["valor"]
+        note_field.value = ""
+        app.page.update()
+
     save_button = ft.FilledButton(
         "Atualizar" if editing else "Salvar", icon=ft.Icons.SAVE_OUTLINED,
         style=ft.ButtonStyle(bgcolor=MEDIUM_GREEN, color=WHITE),
         on_click=save,
+    )
+
+    clear_button = ft.OutlinedButton(
+        "Limpar Campos", icon=ft.Icons.CLEAR_ALL,
+        style=ft.ButtonStyle(color=MEDIUM_GREEN),
+        on_click=clear_fields,
     )
 
     return ft.Column(
@@ -130,7 +150,7 @@ def build(app, transaction: Transaction = None) -> ft.Column:
                         date_field,
                         note_field,
                         ft.Container(height=8),
-                        save_button,
+                        ft.Row([save_button, clear_button], spacing=12),
                     ],
                     spacing=18,
                 ),

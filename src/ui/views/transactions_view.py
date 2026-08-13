@@ -5,7 +5,8 @@ from ui.views.theme import DARK_BG, MEDIUM_GREEN, YELLOW, LIGHT_BG, WHITE, DARK_
 
 
 def build(app) -> ft.Column:
-    """Constrói a vista de Movimentações: pesquisa por descrição + filtro simples por tipo."""
+    """Constrói a vista de Movimentações: pesquisa por descrição + filtro simples por tipo,
+    restrita às movimentações do utilizador atual."""
 
     search_field = ft.TextField(
         hint_text="Pesquisar descrição...", value=app.search_text, width=280,
@@ -47,11 +48,12 @@ def build(app) -> ft.Column:
 
 
 def _get_filtered_transactions(app) -> list:
-    """Aplica o filtro de tipo (se houver) e depois a pesquisa por texto."""
+    """Aplica o filtro de tipo (se houver) e depois a pesquisa por texto, sempre
+    restrito ao utilizador atual."""
     if app.type_filter != "Todos":
-        transactions = app.repo.filter_by_type(app.type_filter)
+        transactions = app.repo.filter_by_type(app.type_filter, user_id=app.current_user.id)
     else:
-        transactions = app.repo.list_transactions()
+        transactions = app.repo.list_transactions(user_id=app.current_user.id)
 
     if app.search_text.strip():
         text = app.search_text.strip().lower()
